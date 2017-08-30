@@ -1,0 +1,49 @@
+html,body,#mapid{
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+.leaflet-container { /*change background color*/
+	z-index: 1;
+    background: #000;
+
+} 
+
+#date {
+	bottom: 1em;
+	height: 200.313px; 
+	width: 1128.6px; 
+	z-index: 2; 
+	position: absolute; 
+	opacity:.1;
+	background-color: rgb(35, 35, 35); 
+	right: 5ch; 
+	overflow-y: hidden; 
+	overflow-x: hidden; 
+	/* transform: translate(-7.6px, -4px); */
+}
+
+.axis {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+
+path.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.axis text {
+    fill: #fff;
+    stroke:none;
+}
+
+text {
+    fill: #fff;
+    stroke:none;
+}
