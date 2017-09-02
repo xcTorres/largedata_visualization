@@ -17,7 +17,7 @@ html,body,#mapid{
 	width: 1128.6px; 
 	z-index: 2; 
 	position: absolute; 
-	opacity:.1;
+	opacity:.5;
 	background-color: rgb(35, 35, 35); 
 	right: 5ch; 
 	overflow-y: hidden; 

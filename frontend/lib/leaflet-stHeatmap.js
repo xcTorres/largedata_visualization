@@ -39,7 +39,7 @@ L.Heatmap = L.GridLayer.extend({
 		
 		var startDate = new Date();
 		var start = new Date();
-		
+		-
 		
 		//'/tile'
 		//url = "./20/"+coords.x+"_"+coords.y+".json";
@@ -47,13 +47,13 @@ L.Heatmap = L.GridLayer.extend({
 		request = $.get(url+'/tile', {
 				level : coords.z,
 				x     : coords.x,
-				y     : coords.y
+				y     : coords.y,
+				time_from: time_from,
+				time_to: time_to
 			},  function(data,textStatus){
 					var end = new Date();
-
-					if (data.length==1) {
-						console.log(data);
-					}
+					
+					console.log(data);
 
 					if ( data.length != 0) {
 						var entry = {
@@ -110,7 +110,7 @@ function color_tile(entry) {
 function pickDrawFuncs() {
     var colormaps = {
         ryw: function (count) {
-            var lc = Math.log(count + 1) / Math.log(100);
+            var lc = Math.log(count + 1) / Math.log(10);
 
             var r = Math.floor(256 * Math.min(1, lc));
             var g = Math.floor(256 * Math.min(1, Math.max(0, lc - 1)));
@@ -139,7 +139,7 @@ function pickDrawFuncs() {
         rect: function draw_rect(context, datum) {
             // var width = datum.x1 - datum.x0;
             // var height = datum.y1 - datum.y0;
-            context.fillRect(datum.x, datum.y,2,2);
+            context.fillRect(datum.x, datum.y,1,1);
         }
     };
 

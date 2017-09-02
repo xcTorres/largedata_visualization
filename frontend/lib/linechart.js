@@ -130,21 +130,6 @@ function loadLineChart(data, field_Name) {
 		time_to = moment(upper_bound).format("YYYY-MM-DD HH:mm:ss");
 		
 		console.log(time_from);
-		// xhr_pool.forEach(function(request,index) {
-			// if(request)
-				// request.abort();
-			// $.ajax({
-				// type:"GET",
-				// url:url+"/terminate",
-				// dataType:"json",
-				// //async: false,
-				// success: function(data,textStatus){
-					// console.log("request abort");
-					// xhr_pool.splice(index, 1);
-				// }
-			// });
-			
-		// });
 
 		heatmap.redraw();
 	}
