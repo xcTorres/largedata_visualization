@@ -139,7 +139,7 @@ function pickDrawFuncs() {
         rect: function draw_rect(context, datum) {
             // var width = datum.x1 - datum.x0;
             // var height = datum.y1 - datum.y0;
-            context.fillRect(datum.x, datum.y,1,1);
+            context.fillRect(datum.x, datum.y,2,2);
         }
     };
 
