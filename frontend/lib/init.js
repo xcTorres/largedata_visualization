@@ -11,16 +11,17 @@ function init() {
 	/*添加底图*/
 	map =L.map(mapid,{
 		maxZoom: 18,
-		minZoom: 0,
+		minZoom: 0
     }).setView([40.7518,-73.9819],10);
 	
 	// "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
 	// FeatureGroup is to store editable layers 
 	var maptile = L.tileLayer(
-	"http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-	//"http://{s}.tiles.mapbox.com/v4/cicerolp.mgdebfa9/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2ljZXJvbHAiLCJhIjoia1IxYmtfMCJ9.3EMmwKCCFN-hmsrQY4_wUQ"
+	//"http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+	"http://{s}.tiles.mapbox.com/v4/cicerolp.mgdebfa9/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2ljZXJvbHAiLCJhIjoia1IxYmtfMCJ9.3EMmwKCCFN-hmsrQY4_wUQ"
 	,{
-		opacity:0.2
+		opacity:0.7,
+		nowrap:true
 	});
 	maptile.addTo(map);
 	

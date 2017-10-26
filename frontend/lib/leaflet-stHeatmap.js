@@ -21,21 +21,21 @@ L.Heatmap = L.GridLayer.extend({
 		
 
 
-		nw = tileBounds.getNorthWest();
+		// nw = tileBounds.getNorthWest();
 
-        // context.fillStyle = 'white';
-        // context.fillRect(0, 0, tileSize.x, 50);
-        // context.fillStyle = 'black';
-        // context.fillText('x: ' + coords.x + ', y: ' + coords.y + ', zoom: ' + coords.z, 20, 20);
-        // context.fillText('lat: ' + sw.lat.toFixed(4) + ', lon: ' + sw.lng.toFixed(4), 20, 40);
-        // context.strokeStyle = 'red';
-        // context.beginPath();
-        // context.moveTo(0, 0);
-        // context.lineTo(tileSize.x-1, 0);
-        // context.lineTo(tileSize.x-1, tileSize.y-1);
-        // context.lineTo(0, tileSize.y-1);
-        // context.closePath();
-        // context.stroke();
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, tileSize.x, 50);
+        context.fillStyle = 'black';
+        context.fillText('x: ' + coords.x + ', y: ' + coords.y + ', zoom: ' + coords.z, 20, 20);
+        context.fillText('lat: ' + sw.lat.toFixed(4) + ', lon: ' + sw.lng.toFixed(4), 20, 40);
+        context.strokeStyle = 'red';
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.lineTo(tileSize.x-1, 0);
+        context.lineTo(tileSize.x-1, tileSize.y-1);
+        context.lineTo(0, tileSize.y-1);
+        context.closePath();
+        context.stroke();
 		
 		var startDate = new Date();
 		var start = new Date();
@@ -110,7 +110,7 @@ function color_tile(entry) {
 function pickDrawFuncs() {
     var colormaps = {
         ryw: function (count) {
-            var lc = Math.log(count + 1) / Math.log(10);
+            var lc = Math.log(count + 1) / Math.log(100);
 
             var r = Math.floor(256 * Math.min(1, lc));
             var g = Math.floor(256 * Math.min(1, Math.max(0, lc - 1)));
@@ -139,7 +139,7 @@ function pickDrawFuncs() {
         rect: function draw_rect(context, datum) {
             // var width = datum.x1 - datum.x0;
             // var height = datum.y1 - datum.y0;
-            context.fillRect(datum.x, datum.y,2,2);
+            context.fillRect(datum.x, datum.y,3,3);
         }
     };
 
