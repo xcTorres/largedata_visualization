@@ -23,40 +23,38 @@ L.Heatmap = L.GridLayer.extend({
 
 		// nw = tileBounds.getNorthWest();
 
-        context.fillStyle = 'white';
-        context.fillRect(0, 0, tileSize.x, 50);
-        context.fillStyle = 'black';
-        context.fillText('x: ' + coords.x + ', y: ' + coords.y + ', zoom: ' + coords.z, 20, 20);
-        context.fillText('lat: ' + sw.lat.toFixed(4) + ', lon: ' + sw.lng.toFixed(4), 20, 40);
-        context.strokeStyle = 'red';
-        context.beginPath();
-        context.moveTo(0, 0);
-        context.lineTo(tileSize.x-1, 0);
-        context.lineTo(tileSize.x-1, tileSize.y-1);
-        context.lineTo(0, tileSize.y-1);
-        context.closePath();
-        context.stroke();
+        // context.fillStyle = 'white';
+        // context.fillRect(0, 0, tileSize.x, 50);
+        // context.fillStyle = 'black';
+        // context.fillText('x: ' + coords.x + ', y: ' + coords.y + ', zoom: ' + coords.z, 20, 20);
+        // context.fillText('lat: ' + sw.lat.toFixed(4) + ', lon: ' + sw.lng.toFixed(4), 20, 40);
+        // context.strokeStyle = 'red';
+        // context.beginPath();
+        // context.moveTo(0, 0);
+        // context.lineTo(tileSize.x-1, 0);
+        // context.lineTo(tileSize.x-1, tileSize.y-1);
+        // context.lineTo(0, tileSize.y-1);
+        // context.closePath();
+        // context.stroke();
 		
-		var startDate = new Date();
-		var start = new Date();
-		-
+		var startDate = moment(time_from).format("MM-DD");
+		var endDate = moment(time_to).format("MM-DD");
+
 		
 		//'/tile'
 		//url = "./20/"+coords.x+"_"+coords.y+".json";
-		console.log(url);
-		request = $.get(url+'/tile', {
-				level : coords.z,
-				x     : coords.x,
-				y     : coords.y,
-				time_from: time_from,
-				time_to: time_to
-			},  function(data,textStatus){
-					var end = new Date();
-					
-					console.log(data);
-
-					if ( data.length != 0) {
-						var entry = {
+		//console.log(url);
+		
+		var st_tileId = coords.x + '' + coords.y + startDate +endDate;
+		
+		console.log(st_tileId);
+		
+		
+		if( heatmapCache(st_tileId) !== undefined) {
+			
+			var data = heatmapCache(st_tileId);
+			console.log(data);
+			var entry = {
 							data:data,
 							context: context,
 							tileSize: tileSize,
@@ -64,10 +62,37 @@ L.Heatmap = L.GridLayer.extend({
 							tile_y: coords.y,
 							tile_zoom: coords.z
 						};
-						color_tile(entry);	
-					}
-					
-			},"json");	
+			color_tile(entry);	
+		}
+
+		else {
+		
+			request = $.get(url+'/tile', {
+					level : coords.z,
+					x     : coords.x,
+					y     : coords.y,
+					time_from: time_from,
+					time_to: time_to
+				},  function(data,textStatus){
+						var end = new Date();
+						
+						//console.log(data);
+						heatmapCache(st_tileId,data);
+
+						if ( data.length != 0) {
+							var entry = {
+								data:data,
+								context: context,
+								tileSize: tileSize,
+								tile_x: coords.x,
+								tile_y: coords.y,
+								tile_zoom: coords.z
+							};
+							color_tile(entry);	
+						}
+						
+				},"json");	
+		}
 		// 异步绘制
         setTimeout(function() {
             done(null, tile);
