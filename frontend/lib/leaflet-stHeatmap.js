@@ -53,7 +53,7 @@ L.Heatmap = L.GridLayer.extend({
 		if( heatmapCache(st_tileId) !== undefined) {
 			
 			var data = heatmapCache(st_tileId);
-			console.log(data);
+			//console.log(data);
 			var entry = {
 							data:data,
 							context: context,
@@ -74,12 +74,18 @@ L.Heatmap = L.GridLayer.extend({
 					time_from: time_from,
 					time_to: time_to
 				},  function(data,textStatus){
-						var end = new Date();
 						
-						//console.log(data);
-						heatmapCache(st_tileId,data);
-
+						// function filter0(data) {
+							// return data > 0 ;
+						// }
+							
+						//data = data.filter(filter0);
+						console.log(data);
+						if(data.length >= 1000)
+							heatmapCache(st_tileId,data);
+						
 						if ( data.length != 0) {
+							
 							var entry = {
 								data:data,
 								context: context,
@@ -108,42 +114,63 @@ function color_tile(entry) {
 
     var fs = pickDrawFuncs();
 	
-    entry.data.forEach(function (d) {
+	
+	for (i in entry.data  ) {
+    //entry.data.forEach(function (d) {
 		
        // var point = map.project( L.latLng(d.y, d.x), entry.tile_zoom).floor();
        // var coords = point.unscaleBy(entry.tileSize).floor();
        // var offset = point.subtract(coords.scaleBy(entry.tileSize));
        // coords.z = entry._tileZoom;
-	
-      var datum = {
+      i = parseInt(i);
+
+		  
+	  x = (i) %256 ;
+	  y = (i)/256 ;
+	  x > 256 ? x=256:x=x;
+	  x < 0 ? x=0:x=x;
+
+	  y > 256 ? y=256:y=y;
+	  y < 0 ? y=0:y=y;
+		
+	  count = entry.data[i];
+	  
+	  //console.log(i);
+	  //console.log(count);
+			
+	  var datum = {
 		  
 		  data_zoom:-1,
-          count: d.v,
-          tile_zoom: entry.tile_zoom,
+		  count: count,
+		  tile_zoom: entry.tile_zoom,
 			// x:offset.x,
 			// y:offset.y,			
-			x:d.x,
-			y:d.y
-      };
+			x:x,
+			y:y
+	  };
 
-      entry.context.fillStyle = fs.color(d.v);//* fs.count_transform(datum)
-      
-      fs.draw(entry.context, datum);
-    });
+	  entry.context.fillStyle = fs.color(count);//* fs.count_transform(datum)
+	  
+	  fs.draw(entry.context, datum);
+	}
+    //});
 }
 
 function pickDrawFuncs() {
     var colormaps = {
         ryw: function (count) {
-            var lc = Math.log(count + 1) / Math.log(100);
 
-            var r = Math.floor(256 * Math.min(1, lc));
-            var g = Math.floor(256 * Math.min(1, Math.max(0, lc - 1)));
-            var b = Math.floor(256 * Math.min(1, Math.max(0, lc - 2)));
+				var lc = Math.log(count + 1) / Math.log(100);
 
-            var a = Math.min(1, lc);
+				var r = Math.floor(256 * Math.min(1, lc));
+				var g = Math.floor(256 * Math.min(1, Math.max(0, lc - 1)));
+				var b = Math.floor(256 * Math.min(1, Math.max(0, lc - 2)));
 
-            return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+				var a = Math.min(1, lc);
+
+				return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+			
+			
         },
         bbb: d3.scaleLinear()
             .domain([1, 200])
