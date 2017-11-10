@@ -64,9 +64,9 @@ function init() {
 	
 	/*添加时间轴*/
 	var data_offset1  = "2016-01-01 00:00:00";
-	var data_offset2  = "2016-01-02 00:00:00";
-	var data_offset3  = "2016-01-03 00:00:00";
-	var data_offset4  = "2016-01-04 00:00:00";
+	var data_offset2  = "2016-02-02 00:00:00";
+	var data_offset3  = "2016-03-03 00:00:00";
+	var data_offset4  = "2016-06-04 00:00:00";
 
 	var data =  [ [data_offset1,0],[data_offset2,150],[data_offset3,140],[data_offset4,200]];
 	loadLineChart(data, "date");

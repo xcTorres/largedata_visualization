@@ -23,40 +23,38 @@ L.Heatmap = L.GridLayer.extend({
 
 		// nw = tileBounds.getNorthWest();
 
-        context.fillStyle = 'white';
-        context.fillRect(0, 0, tileSize.x, 50);
-        context.fillStyle = 'black';
-        context.fillText('x: ' + coords.x + ', y: ' + coords.y + ', zoom: ' + coords.z, 20, 20);
-        context.fillText('lat: ' + sw.lat.toFixed(4) + ', lon: ' + sw.lng.toFixed(4), 20, 40);
-        context.strokeStyle = 'red';
-        context.beginPath();
-        context.moveTo(0, 0);
-        context.lineTo(tileSize.x-1, 0);
-        context.lineTo(tileSize.x-1, tileSize.y-1);
-        context.lineTo(0, tileSize.y-1);
-        context.closePath();
-        context.stroke();
+        // context.fillStyle = 'white';
+        // context.fillRect(0, 0, tileSize.x, 50);
+        // context.fillStyle = 'black';
+        // context.fillText('x: ' + coords.x + ', y: ' + coords.y + ', zoom: ' + coords.z, 20, 20);
+        // context.fillText('lat: ' + sw.lat.toFixed(4) + ', lon: ' + sw.lng.toFixed(4), 20, 40);
+        // context.strokeStyle = 'red';
+        // context.beginPath();
+        // context.moveTo(0, 0);
+        // context.lineTo(tileSize.x-1, 0);
+        // context.lineTo(tileSize.x-1, tileSize.y-1);
+        // context.lineTo(0, tileSize.y-1);
+        // context.closePath();
+        // context.stroke();
 		
-		var startDate = new Date();
-		var start = new Date();
-		-
+		var startDate = moment(time_from).format("MM-DD");
+		var endDate = moment(time_to).format("MM-DD");
+
 		
 		//'/tile'
 		//url = "./20/"+coords.x+"_"+coords.y+".json";
-		console.log(url);
-		request = $.get(url+'/tile', {
-				level : coords.z,
-				x     : coords.x,
-				y     : coords.y,
-				time_from: time_from,
-				time_to: time_to
-			},  function(data,textStatus){
-					var end = new Date();
-					
-					console.log(data);
-
-					if ( data.length != 0) {
-						var entry = {
+		//console.log(url);
+		
+		var st_tileId = coords.x + '' + coords.y + startDate +endDate;
+		
+		console.log(st_tileId);
+		
+		
+		if( heatmapCache(st_tileId) !== undefined) {
+			
+			var data = heatmapCache(st_tileId);
+			//console.log(data);
+			var entry = {
 							data:data,
 							context: context,
 							tileSize: tileSize,
@@ -64,10 +62,43 @@ L.Heatmap = L.GridLayer.extend({
 							tile_y: coords.y,
 							tile_zoom: coords.z
 						};
-						color_tile(entry);	
-					}
-					
-			},"json");	
+			color_tile(entry);	
+		}
+
+		else {
+		
+			request = $.get(url+'/tile', {
+					level : coords.z,
+					x     : coords.x,
+					y     : coords.y,
+					time_from: time_from,
+					time_to: time_to
+				},  function(data,textStatus){
+						
+						// function filter0(data) {
+							// return data > 0 ;
+						// }
+							
+						//data = data.filter(filter0);
+						console.log(data);
+						if(data.length >= 1000)
+							heatmapCache(st_tileId,data);
+						
+						if ( data.length != 0) {
+							
+							var entry = {
+								data:data,
+								context: context,
+								tileSize: tileSize,
+								tile_x: coords.x,
+								tile_y: coords.y,
+								tile_zoom: coords.z
+							};
+							color_tile(entry);	
+						}
+						
+				},"json");	
+		}
 		// 异步绘制
         setTimeout(function() {
             done(null, tile);
@@ -83,42 +114,63 @@ function color_tile(entry) {
 
     var fs = pickDrawFuncs();
 	
-    entry.data.forEach(function (d) {
+	
+	for (i in entry.data  ) {
+    //entry.data.forEach(function (d) {
 		
        // var point = map.project( L.latLng(d.y, d.x), entry.tile_zoom).floor();
        // var coords = point.unscaleBy(entry.tileSize).floor();
        // var offset = point.subtract(coords.scaleBy(entry.tileSize));
        // coords.z = entry._tileZoom;
-	
-      var datum = {
+      i = parseInt(i);
+
+		  
+	  x = (i) %256 ;
+	  y = (i)/256 ;
+	  x > 256 ? x=256:x=x;
+	  x < 0 ? x=0:x=x;
+
+	  y > 256 ? y=256:y=y;
+	  y < 0 ? y=0:y=y;
+		
+	  count = entry.data[i];
+	  
+	  //console.log(i);
+	  //console.log(count);
+			
+	  var datum = {
 		  
 		  data_zoom:-1,
-          count: d.v,
-          tile_zoom: entry.tile_zoom,
+		  count: count,
+		  tile_zoom: entry.tile_zoom,
 			// x:offset.x,
 			// y:offset.y,			
-			x:d.x,
-			y:d.y
-      };
+			x:x,
+			y:y
+	  };
 
-      entry.context.fillStyle = fs.color(d.v);//* fs.count_transform(datum)
-      
-      fs.draw(entry.context, datum);
-    });
+	  entry.context.fillStyle = fs.color(count);//* fs.count_transform(datum)
+	  
+	  fs.draw(entry.context, datum);
+	}
+    //});
 }
 
 function pickDrawFuncs() {
     var colormaps = {
         ryw: function (count) {
-            var lc = Math.log(count + 1) / Math.log(100);
 
-            var r = Math.floor(256 * Math.min(1, lc));
-            var g = Math.floor(256 * Math.min(1, Math.max(0, lc - 1)));
-            var b = Math.floor(256 * Math.min(1, Math.max(0, lc - 2)));
+				var lc = Math.log(count + 1) / Math.log(100);
 
-            var a = Math.min(1, lc);
+				var r = Math.floor(256 * Math.min(1, lc));
+				var g = Math.floor(256 * Math.min(1, Math.max(0, lc - 1)));
+				var b = Math.floor(256 * Math.min(1, Math.max(0, lc - 2)));
 
-            return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+				var a = Math.min(1, lc);
+
+				return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+			
+			
         },
         bbb: d3.scaleLinear()
             .domain([1, 200])
