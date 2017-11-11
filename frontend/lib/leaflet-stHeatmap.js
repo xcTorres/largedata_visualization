@@ -3,7 +3,8 @@ L.Heatmap = L.GridLayer.extend({
 	
     createTile: function (coords,done) {
         var tile = document.createElement('canvas','leaflet-tile');
-
+		
+		
         var tileSize = this.getTileSize();
         tile.setAttribute('width', tileSize.x);
         tile.setAttribute('height', tileSize.y);
@@ -45,15 +46,14 @@ L.Heatmap = L.GridLayer.extend({
 		//url = "./20/"+coords.x+"_"+coords.y+".json";
 		//console.log(url);
 		
-		var st_tileId = coords.x + '' + coords.y + startDate +endDate;
+		var st_tileId = coords.x + '' + coords.y +  coords.z + startDate +endDate;
 		
-		console.log(st_tileId);
+		//console.log(st_tileId);
 		
 		
 		if( heatmapCache(st_tileId) !== undefined) {
 			
 			var data = heatmapCache(st_tileId);
-			//console.log(data);
 			var entry = {
 							data:data,
 							context: context,
@@ -80,11 +80,13 @@ L.Heatmap = L.GridLayer.extend({
 						// }
 							
 						//data = data.filter(filter0);
-						console.log(data);
-						if(data.length >= 1000)
+						var count = Object.keys(data).length;
+						//console.log(count);
+						
+						if(count>1000)
 							heatmapCache(st_tileId,data);
 						
-						if ( data.length != 0) {
+						if ( count != 0) {
 							
 							var entry = {
 								data:data,

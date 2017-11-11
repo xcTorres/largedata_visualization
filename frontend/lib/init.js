@@ -8,59 +8,85 @@ var colors = colorbrewer.Oranges[9];
 // var time_to = "2016-03-01";
 // var heatmap = null;
 function init() {
+	
+	var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        osm = L.tileLayer(osmUrl, { maxZoom: 18, attribution: osmAttrib,opacity:0.2,nowrap:true });
+		
+	var mapboxurl = "http://{s}.tiles.mapbox.com/v4/cicerolp.mgdebfa9/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2ljZXJvbHAiLCJhIjoia1IxYmtfMCJ9.3EMmwKCCFN-hmsrQY4_wUQ",
+		mapbox = L.tileLayer(mapboxurl, { maxZoom: 18,opacity:0.5,nowrap:true });
+
+	
+	
+	
 	/*添加底图*/
 	map =L.map(mapid,{
 		maxZoom: 18,
-		minZoom: 0
-    }).setView([40.7518,-73.9819],10);
+		minZoom: 0,
+		layers: mapbox
+    }).setView([40.7518,-73.9819],6);
 	
-	// "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-	// FeatureGroup is to store editable layers 
-	var maptile = L.tileLayer(
-	//"http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-	"http://{s}.tiles.mapbox.com/v4/cicerolp.mgdebfa9/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2ljZXJvbHAiLCJhIjoia1IxYmtfMCJ9.3EMmwKCCFN-hmsrQY4_wUQ"
-	,{
-		opacity:0.7,
-		nowrap:true
-	});
-	maptile.addTo(map);
+	var baseMaps = {
+		"<span style='color: gray'>Mapbox</span>": mapbox,
+		"Osm": osm
+	};
+	L.control.layers(baseMaps).addTo(map);
 	
 	
-	// // 添加地图工具栏
-	// map.drawnItems = new L.FeatureGroup();
-    // map.drawnItems.addTo(map);
+	
+	var drawnItems = new L.FeatureGroup();
+	map.addLayer(drawnItems);
 
-    // map.editControl = new L.drawLocal.draw({
-		// draw: {
-			// rectangle: true,
-			// //polygon: false,
-			// polyline: false,
-			// circle: false,
-			// marker: false,
-			// polygon: { allowIntersection: false }
-		// },
-		// edit: {
-			// featureGroup: map.drawnItems
-		// }
-    // });
-    // map.editControl.setDrawingOptions({
-		// rectangle:{ shapeOptions:{color: this.nextColor(), weight: 2,
-					 // opacity:.9}},
-		// polygon:{ shapeOptions:{color: this.nextColor(), weight: 2,
-					 // opacity:.9}}
-    // });
-
-    // map.editControl.addTo(map);
+    var drawControl = new L.Control.Draw({
+        position: 'topleft',
+        draw: {
+            polyline: false,
+            polygon: true,
+            circle: false,
+            marker: true,
+			circlemarker:false,
+        },
+        edit: {
+            featureGroup: drawnItems,
+            remove: true
+        }
+    });
+    map.addControl(drawControl);
 	
-    // map.on('draw:created', function (e) {
-		// drawCreated(e);
-    // });
+	
 
-	// map.on('draw:drawstop',function(e) {
-		// drawstop(e);
-	// });
+	map.on(L.Draw.Event.CREATED, function (e) {
+        var type = e.layerType,
+             layer = e.layer;
+
+        if (type === 'marker') {
+            layer.bindPopup('A popup!');
+        }
+
+        drawnItems.addLayer(layer);
+    });
+
+    map.on(L.Draw.Event.EDITED, function (e) {
+        var layers = e.layers;
+        var countOfEditedLayers = 0;
+        layers.eachLayer(function (layer) {
+            countOfEditedLayers++;
+        });
+        console.log("Edited " + countOfEditedLayers + " layers");
+    });
+	
 	
 	heatmap  = new L.Heatmap().addTo(map);
+	heatmap.setZIndex(4);
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/*添加时间轴*/
 	var data_offset1  = "2016-01-01 00:00:00";
