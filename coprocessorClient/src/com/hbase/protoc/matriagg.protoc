@@ -1,0 +1,22 @@
+option java_package = "com.hbase.protoc";
+option java_outer_classname = "MatrixColAgg";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+option optimize_for = SPEED;
+message MatrixColAggRequest {
+  optional string startKey = 1;
+  optional string endKey = 2;
+}
+ 
+message MatrixColAggResponse {
+  repeated SumMatrix sum = 1;
+}
+
+message SumMatrix{
+  repeated int32 array = 1;
+}
+
+service MatrixColAggService {
+  rpc getMatrixColAgg(MatrixColAggRequest)
+    returns (MatrixColAggResponse);
+}

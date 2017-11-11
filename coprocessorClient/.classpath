@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/commons-codec-1.9.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/commons-collections-3.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/commons-configuration-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/commons-lang-2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/commons-logging-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/guava-12.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hadoop-auth-2.5.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hadoop-client-2.5.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hadoop-common-2.5.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-client-1.2.0-cdh5.10.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-client-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-common-1.2.0-cdh5.10.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-common-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-hadoop-compat-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-hadoop2-compat-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-prefix-tree-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-procedure-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-protocol-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/hbase-server-1.2.0-cdh5.10.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/htrace-core-3.1.0-incubating.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/httpcore-4.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/jackson-core-asl-1.9.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/jackson-jaxrs-1.9.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/jackson-mapper-asl-1.9.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/jackson-xc-1.9.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/log4j-1.2.17.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/metrics-core-2.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/netty-all-4.0.23.Final.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/protobuf-java-2.5.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/slf4j-api-1.7.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/slf4j-log4j12-1.7.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/zookeeper-3.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="conf"/>
+	<classpathentry exported="true" kind="lib" path="jarlib/json.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
