@@ -22,7 +22,8 @@ import mercantile
 
 def transToStamp(t):
 
-    timeArray = dt.datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
+    timeArray = dt.datetime.strptime(t, "%Y-%m-%dT%H:%M:%SZ")
+    # timeArray = dt.datetime.strptime(t, "%m/%d/%Y %H:%M:%S %p")
 
     d = timeArray.date()
     #h = timeArray.time().hour
@@ -50,19 +51,28 @@ def quadkey_to_num(qk):
     return number
 
 def process( line, low_level,up_level ):
+
+    result = []
     try:
-        lng = float(line[5])
-        lat = float(line[6])
+        # lng = float(line[5])
+        # lat = float(line[6])
+        # lng = float(line[-3])
+        # lat = float(line[-4])
+        lng = float(line[3])
+        lat = float(line[2])
+
+
+        # stamp = transToStamp(line[-5])
+        stamp = transToStamp(line[1])
+
+        for i in range(low_level,up_level+1):
+            tile_id = lnglat_to_quad(lng,lat,i)
+            quadkey_to_num(tile_id)
+            result.append( (tile_id,stamp) )
+
     except:
         return
 
-    stamp = transToStamp(line[1])
-
-    result = []
-    for i in range(low_level,up_level+1):
-        tile_id = lnglat_to_quad(lng,lat,i)
-        quadkey_to_num(tile_id)
-        result.append( (tile_id,stamp) )
     return result
 
 def process2( line ):
@@ -73,7 +83,7 @@ def process2( line ):
     quadkey_pixel = mercantile.quadkey_to_tile(quad_key)
 
     result = []
-    if quadkey_pixel.z >= 12:
+    if quadkey_pixel.z >= 8:
 
         t = mercantile.tile(*mercantile.ul(quadkey_pixel.x, quadkey_pixel.y, quadkey_pixel.z) + (quadkey_pixel.z - 8,))
         t_quadkey = mercantile.quadkey(t)
@@ -95,50 +105,30 @@ def process2( line ):
 
 
 def sort_timeseries(a):
-
-    l = list(a)
-    counts = dict(Counter(l))
-    # sorted_time = OrderedDict(sorted(counts.items())).items()
-
-    # sorted_agg = []
-    # for_aggregate = 0
-    # for i in range(0, len(sorted_time)):
-    #     cur_timetag = sorted_time[i][0]
-    #     kv = {}
-
-        # if i == 0:
-        #     for_aggregate = sorted_time[i][1]
-        # else:
-        #     for_aggregate = sorted_time[i][1] + for_aggregate
-
-        # kv[cur_timetag] = for_aggregate
-        # sorted_agg.append(kv)
-
-    # return sorted_agg
-    return counts
-
-def fillzero(a):
-
-    data = list(a)
-
-    result = [0] * 256 *256
-
-    for ele in data:
-
-        index = ele[0]
-        result[index] = ele[1]
-
-    return result
+	
+    if a is not None:
+        l = list(a)
+    
+        counts = dict(Counter(l))
+        return counts
 
 
 if __name__ == '__main__':
 
     sc = SparkContext()
-    csvfile = sc.textFile("hdfs://192.168.0.17:8020/user/root/ny_taxi/yellow_tripdata_2016-0[1-6].csv")
-    all = csvfile.map(lambda line: line.split(","))
+    # csvfile = sc.textFile("hdfs://192.168.0.17:8020/user/root/ny_taxi/yellow_tripdata_2016-0[1-6].csv")
+    # all = csvfile.map(lambda line: line.split(","))
+    # csvfile = sc.textFile("hdfs://192.168.0.17:8020/user/root/dataset/crime.csv")
+    # all = csvfile.map(lambda line: line.split(","))
+    csvfile = sc.textFile("hdfs://192.168.0.17:8020/user/root/brightkike/loc-brightkite_totalCheckins.txt")
+    # all = csvfile.map(lambda line: line.split(","))
+    all = csvfile.map(lambda line: line.split())
+        # .flatMap(lambda x: x) \
+    # content = all.map( lambda line: process(line,12,22) ).\
 
-    header = all.first()
-    content = all.filter(lambda line: line[0] != header[0] ).map( lambda line: process(line,12,22) ).flatMap(lambda x: x) \
-        .groupByKey().mapValues(sort_timeseries)
+    # header = all.first()
+    # content = all.filter(lambda line: line[0] != header[0] ).map( lambda line: process(line,8,22) )\
+    content = all.filter(lambda line: len(line)>4 ).map( lambda line: process(line,8,22) )\
+    .flatMap(lambda x:'' if x is None else x).groupByKey().mapValues(sort_timeseries)
     content = content.map(lambda line: process2(line)).flatMap(lambda x:x).groupByKey().mapValues(list)
-    content.saveAsTextFile("/user/root/taxi_temp/")
+    content.saveAsTextFile("/user/root/brightkite_result/")
