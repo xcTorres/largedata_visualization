@@ -2,11 +2,11 @@
 var map;
 var heatmap = null;
 var url = "http://192.168.0.17:9010";
-var time_from = "2016-01-01 00:00:00";	
-var time_to = "2016-06-30 00:00:00";
-var time_lowerBound = "2016-01-01 00:00:00";
-var time_upperBound = "2017-12-31 00:00:00";
-
+var time_from = "2009-01-01 00:00:00";	
+var time_to = "2010-10-30 00:00:00";
+var time_lowerBound = "2009-01-01 00:00:00";
+var time_upperBound = "2010-10-31 00:00:00";
+var time_series = [];
 $.ajaxSetup({
     timeout: 20000 //Time in milliseconds
 });

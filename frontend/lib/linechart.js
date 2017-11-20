@@ -1,11 +1,14 @@
 
-function loadLineChart(data, field_Name) {
-    if (data.length <= 1) return;
-
+function loadLineChart(datas, field_Name) {
+    if (datas.length <= 1) return;
+	
+	
+	
     var div = d3.select("#" + field_Name);
 	
 	
 	var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+	//var parseTime2 = d3.timeParse("%Y-%m-%d");
 	
 	
 	var svg = div.append("svg")  
@@ -30,24 +33,30 @@ function loadLineChart(data, field_Name) {
 		.curve(d3.curveCardinal)
 		.x(function(d) { return x( parseTime(d[0]) ); })
 		.y(function(d) { return y( d[1] ); });
+		
+	var line2 = d3.line()
+		.curve(d3.curveCardinal)
+		.x(function(d) { return x( parseTime2(d[0]) ); })
+		.y(function(d) { return y( d[1] ); });
 
     // Select the svg element, if it exists.
-    var svg = div.selectAll('svg').data([data]);
+    var svg = div.selectAll('svg').data([datas]);
 
     //Scale宽度所对应的值
-	// x.domain(d3.extent(data, function(d) { return parseTime(d[0]); }));
+	// x.domain(d3.extent(datas, function(d) { return parseTime(d[0]); }));
+	//x.domain([ parseTime(time_from),parseTime(time_to) ]);
 	x.domain([ parseTime(time_from),parseTime(time_to) ]);
 
 	y.domain([
-		d3.min(data, function(d) { return d[1]; }),
-		d3.max(data, function(d) { return d[1]; })
+		d3.min(datas, function(d) { return d[1]; }),
+		d3.max(datas, function(d) { return d[1]; })
 	]);
 
 	
     g.append("text")
       .attr("x", width/2 )
       .attr("y", margin.top)
-      .attr("dy", ".35em")
+      .attr("dy", "1em")
       .text("Timeline");
 	
 	g.append("g")
@@ -62,20 +71,20 @@ function loadLineChart(data, field_Name) {
 		.text("Count")
 		.attr("transform", "rotate(-90)")
 		.attr("y", 6)
-		.attr("dy", "0.71em")
+		.attr("dy", "1em")
 		.attr("fill", "#000");
 	
 	
 	//添加画线的画布
 	g.selectAll("time")
-		.data([data])
+		.data([datas])
 		.enter().append("g")
 		.append("path")
 		.attr("class", "line")
 		.attr("clip-path", "url(#clip)")
         .attr("width",width)
         .attr("height", height)
-		.attr("d", line(data));
+		.attr("d", line(datas));
 	
 	
 	var zoom = d3.zoom()
@@ -89,35 +98,11 @@ function loadLineChart(data, field_Name) {
 		.attr("pointer-events", "all")
 		.call(zoom);
 		
-/* 	//添加画刷
-	var brush = d3.brushX()
-		.extent([[0, 0], [width, height]])
-		.on("end", brushed);
-    g.append("rect")
-		.attr("class", "brush")
-		.attr("width", width)
-		.attr("height", height)
-		.attr("fill", "none")
-		.call(brush);
-		
-	function brushed() {
-		
-		if (!d3.event.sourceEvent) return; 
-		if (!d3.event.selection) return;   
-		var d0 = d3.event.selection.map(x.invert,x);
-		x.domain(d0);
-		svg.select("g.axis.axis--x").call(xAxis);	
-		svg.select("path.line").attr("d", line.x(function(d) { return (x(d[0]))}));
-     }	 */
 		
 	function draw() {
 	
 		var xz = d3.event.transform.rescaleX(x);
-		    // domain1 = xz.domain()[0];
-		    // domain2 = xz.domain()[1];
-		// if( domain1.getTime()<parseTime(time_lowerBound).getTime() )
-			// xz.domain([parseTime(time_lowerBound),domain2]);
-		// console.log(xz.domain()[0]);
+
 		svg.select("g.axis.axis--x").call(xAxis.scale(xz));
 		svg.select("path.line").attr("d", line.x(function(d) { return xz(parseTime(d[0]))}));
 	}
@@ -129,7 +114,12 @@ function loadLineChart(data, field_Name) {
 		time_from = moment(lower_bound).format("YYYY-MM-DD HH:mm:ss");
 		time_to = moment(upper_bound).format("YYYY-MM-DD HH:mm:ss");
 		
-		console.log(time_from);
+		var sw = map.getBounds().getSouthWest();
+		var ne = map.getBounds().getNorthEast(); 
+		var bounds = sw.lng.toFixed(4)+","+ sw.lat.toFixed(4)+","+ne.lng.toFixed(4)+","+ne.lat.toFixed(4);
+
+	
+		getTimeseries();
 
 		heatmap.redraw();
 	}

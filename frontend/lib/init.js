@@ -75,39 +75,18 @@ function init() {
         console.log("Edited " + countOfEditedLayers + " layers");
     });
 	
+	map.on('moveend zoomend', function() {
+		
+		getTimeseries();
+	});
 	
+	
+	getTimeseries();
+			
+
 	heatmap  = new L.Heatmap().addTo(map);
 	heatmap.setZIndex(4);
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/*添加时间轴*/
-	var data_offset1  = "2016-01-01 00:00:00";
-	var data_offset2  = "2016-02-02 00:00:00";
-	var data_offset3  = "2016-03-03 00:00:00";
-	var data_offset4  = "2016-06-04 00:00:00";
-
-	var data =  [ [data_offset1,0],[data_offset2,150],[data_offset3,140],[data_offset4,200]];
-	loadLineChart(data, "date");
-	// var time_series = new Timeseries("date");
-	// time_series.brush_callback = function(start,end){
-		// time_from = moment(start).format("YYYY-MM-DD HH:mm:ss");
-		
-		// time_to = moment(end).format("YYYY-MM-DD HH:mm:ss");
-		// console.log(time_to);
-		// heatmap.redraw();
-		// time_series.redraw();
-	// };
-	
-	// time_series.setData( {data:data},"line");
-	// time_series.redraw();	
 }
 
 function nextColor(){
@@ -146,3 +125,38 @@ function drawstop(e){
 	console.log(bounds);
 	//getHeatMap(this.bounds,time_from,time_to);
 };
+
+function getTimeseries(){
+	
+	var sw = map.getBounds().getSouthWest();
+	var ne = map.getBounds().getNorthEast(); 
+	var bounds = sw.lng.toFixed(4)+","+ sw.lat.toFixed(4)+","+ne.lng.toFixed(4)+","+ne.lat.toFixed(4);
+
+	
+	$.get(url+'/time_series', {
+			level : map.getZoom(),
+			bounds: bounds,
+			time_from: time_from,
+			time_to: time_to
+		},  function(data,textStatus){
+			
+			time_series = [];
+			for (i in data  ) {
+				d = moment(i).format("YYYY-MM-DD HH:mm:ss");
+				time_series.push([d,data[i]]);
+			}
+
+			time_series.sort(function(x, y){
+			   return d3.ascending(x[0],y[0]);
+			});
+			
+			console.log(time_series);
+			
+			if(time_series.length>1) {
+				
+				d3.select("svg").remove();
+				loadLineChart(time_series,"date");
+			}
+			
+		},"json");	
+}

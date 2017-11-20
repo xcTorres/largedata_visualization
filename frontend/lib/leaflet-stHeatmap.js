@@ -75,11 +75,6 @@ L.Heatmap = L.GridLayer.extend({
 					time_to: time_to
 				},  function(data,textStatus){
 						
-						// function filter0(data) {
-							// return data > 0 ;
-						// }
-							
-						//data = data.filter(filter0);
 						var count = Object.keys(data).length;
 						//console.log(count);
 						
@@ -98,6 +93,7 @@ L.Heatmap = L.GridLayer.extend({
 							};
 							color_tile(entry);	
 						}
+						
 						
 				},"json");	
 		}
