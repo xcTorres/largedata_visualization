@@ -1,6 +1,4 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from SocketServer import ThreadingMixIn
-import threading
 from urlparse import urlparse,parse_qs
 import datetime
 import jpype
@@ -9,10 +7,11 @@ import happybase
 import time
 import mercantile
 
-
+from SocketServer import ThreadingMixIn
 
 HOST_IP = ''
 PORT = 9010
+dataset = "nyc_taxi"
 
 def transToStamp(t):
 
@@ -27,11 +26,26 @@ def quadkey_to_num(qk):
         if i != len(qk)-1:
             number = number << 2
     return number
-
+    # return str(len(qk)) + "_" + str(number)
 # class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 #     """Handle requests in a separate thread."""
 #     pass
 
+def  check_bounds(bounds):
+
+    new_bounds = []
+
+    new_bounds.append(max(-180,float(bounds[0])))
+    new_bounds.append(max(-85,float(bounds[1])))
+    new_bounds.append(min(180,float(bounds[2])))
+    new_bounds.append(min(85,float(bounds[3])))
+
+    return new_bounds
+
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """ This class allows to handle requests in separated threads.
+        No further content needed, don't touch this. """
 
 
 class myHandler(BaseHTTPRequestHandler):
@@ -57,16 +71,8 @@ class myHandler(BaseHTTPRequestHandler):
             tile_id_from = str(tile_id) + ":" + str(time_from)
             tile_id_to = str(tile_id) + ":" + str(time_to)
 
-
-            # if not  jpype.isThreadAttachedToJVM():
-            # jpype.attachThreadToJVM()
-
-            coprocessor = jpype.JClass("com.hbase.main.MainEntrance")
-            cp = coprocessor()
-
-            # hbase_response =cp.mutiSum("tiles", tile_id_from, tile_id_to)
-            # hbase_response =cp.mutiSum("brightkite", tile_id_from, tile_id_to)
-            hbase_response =cp.mutiSum("crime", tile_id_from, tile_id_to)
+            jpype.attachThreadToJVM()
+            hbase_response =cp.mutiSum(dataset, tile_id_from, tile_id_to)
             # print hbase_response
             # if len(hbase_response) != 0:
             end = time.time()
@@ -103,10 +109,12 @@ class myHandler(BaseHTTPRequestHandler):
             bounds = query_components["bounds"][0]
             bounds = bounds.split(",")
             time_from = transToStamp( query_components["time_from"][0] )
-            time_to = transToStamp( query_components["time_to"][0] )
+            time_to = transToStamp( query_components["time_to"][0])
 
-            tiles = mercantile.tiles(float(bounds[0]),float(bounds[1]),float(bounds[2]), \
-                                     float(bounds[3]), [int(level), ])
+
+            new_bounds =  check_bounds(bounds)
+            tiles = mercantile.tiles(new_bounds[0],new_bounds[1],new_bounds[2], \
+                                     new_bounds[3], [int(level), ])
 
             tile_numbers = []
             for tile in list(tiles):
@@ -115,25 +123,30 @@ class myHandler(BaseHTTPRequestHandler):
                 tile_numbers.append(t_num)
 
             tile_numbers = ' '.join(str(x) for x in tile_numbers)
-            print tile_numbers
-            print time_from
-            print time_to
+            jpype.attachThreadToJVM()
+            res  = cp.timeSeriesCount(dataset,tile_numbers,str(time_from),str(time_to))
+
+            #print res
 
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
+            self.wfile.write(res)
 
+            return
 
-            self.wfile.write(tile_numbers)
 
 if __name__ == '__main__':
-    jpype.startJVM(jpype.getDefaultJVMPath(), "-ea", "-Djava.class.path=%s" % ('/tmp/runClient2.jar'))
+    jpype.startJVM(jpype.getDefaultJVMPath(), "-ea ", "-Djava.class.path=%s" % ('/tmp/runClient2.jar'))
+    jpype.attachThreadToJVM()
+    coprocessor = jpype.JClass("com.hbase.main.MainEntrance")
+    cp = coprocessor()
 
-
-    httpd = HTTPServer((HOST_IP, PORT), myHandler)
+    httpd = ThreadedHTTPServer((HOST_IP, PORT), myHandler)
     print "serving at port", PORT
     httpd.serve_forever()
+
 
 
 
