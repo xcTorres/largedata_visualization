@@ -2,7 +2,7 @@ L.Heatmap = L.GridLayer.extend({
 	
 	
     createTile: function (coords,done) {
-        var tile = document.createElement('canvas','leaflet-tile');
+        var tile = document.createElement('canvas','leaflet-tile','leaflet-zoom-animated ');
 		
 		
         var tileSize = this.getTileSize();
@@ -158,7 +158,7 @@ function pickDrawFuncs() {
     var colormaps = {
         ryw: function (count) {
 
-				var lc = Math.log(count + 1) / Math.log(100);
+				var lc = Math.log(count + 1) / Math.log(50);
 
 				var r = Math.floor(256 * Math.min(1, lc));
 				var g = Math.floor(256 * Math.min(1, Math.max(0, lc - 1)));

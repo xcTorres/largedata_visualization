@@ -12,11 +12,11 @@ function loadLineChart(datas, field_Name) {
 	
 	
 	var svg = div.append("svg")  
-				 .style("width", 1128)
+				 .style("width", 1228)
 				 .style("height", 200);
 				 
-		margin = {top: 10, right: 20, bottom: 20, left: 40},
-		width = 1128 - margin.left - margin.right,
+		margin = {top: 10, right: 20, bottom: 20, left: 60},
+		width = 1228 - margin.left - margin.right,
 		height = 200 - margin.top - margin.bottom,
 		g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
@@ -30,7 +30,7 @@ function loadLineChart(datas, field_Name) {
 	
 	//定义直线类型
 	var line = d3.line()
-		.curve(d3.curveCardinal)
+		.curve(d3.curveLinear)
 		.x(function(d) { return x( parseTime(d[0]) ); })
 		.y(function(d) { return y( d[1] ); });
 		
@@ -70,8 +70,8 @@ function loadLineChart(datas, field_Name) {
 		.append("text")
 		.text("Count")
 		.attr("transform", "rotate(-90)")
-		.attr("y", 6)
-		.attr("dy", "1em")
+		.attr("y", 10)
+		.attr("dy", "2em")
 		.attr("fill", "#000");
 	
 	

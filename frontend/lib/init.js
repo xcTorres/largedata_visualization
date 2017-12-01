@@ -21,10 +21,17 @@ function init() {
 	
 	/*添加底图*/
 	map =L.map(mapid,{
-		maxZoom: 18,
-		minZoom: 0,
+		maxZoom: 16,
+		minZoom: 2,
+		maxBounds: [
+			//south west
+			[-85, -180],
+			//north east
+			[85, 180]
+			],
+		noWrap: true,
 		layers: mapbox
-    }).setView([40.7518,-73.9819],6);
+    }).setView([40.7518,-73.9819],9);
 	
 	var baseMaps = {
 		"<span style='color: gray'>Mapbox</span>": mapbox,
@@ -140,6 +147,9 @@ function getTimeseries(){
 			time_to: time_to
 		},  function(data,textStatus){
 			
+			
+			
+			
 			time_series = [];
 			for (i in data  ) {
 				d = moment(i).format("YYYY-MM-DD HH:mm:ss");
@@ -153,6 +163,8 @@ function getTimeseries(){
 			console.log(time_series);
 			
 			if(time_series.length>1) {
+				
+				
 				
 				d3.select("svg").remove();
 				loadLineChart(time_series,"date");
