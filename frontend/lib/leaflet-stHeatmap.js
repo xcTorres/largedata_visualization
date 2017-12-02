@@ -68,6 +68,7 @@ L.Heatmap = L.GridLayer.extend({
 		else {
 		
 			request = $.get(url+'/tile', {
+					dataset:dataset,
 					level : coords.z,
 					x     : coords.x,
 					y     : coords.y,
@@ -146,8 +147,9 @@ function color_tile(entry) {
 			x:x,
 			y:y
 	  };
-
-	  entry.context.fillStyle = fs.color(count);//* fs.count_transform(datum)
+		
+	  fs.count_transform(datum);
+	  entry.context.fillStyle = fs.color(count);//
 	  
 	  fs.draw(entry.context, datum);
 	}
@@ -207,7 +209,7 @@ function pickDrawFuncs() {
              *
              * BRIGHTNESS is linked to the UI control (see bottom of file)
              */
-            return Math.pow(2, datum.data_zoom - datum.tile_zoom + BRIGHTNESS);
+            return Math.pow(2, datum.data_zoom + datum.tile_zoom + BRIGHTNESS);
         },
         no_scaling: function () {
             return 1;
@@ -225,4 +227,4 @@ function pickDrawFuncs() {
 var BRIGHTNESS = -7;
 var PLOTTING_MODE = "rect";
 var PLOTTING_COLOR_SCALE = "ryw";
-var PLOTTING_TRANSFORM = "no_scaling";
+var PLOTTING_TRANSFORM = "density_scaling";

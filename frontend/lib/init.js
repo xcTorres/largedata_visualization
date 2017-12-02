@@ -31,7 +31,7 @@ function init() {
 			],
 		noWrap: true,
 		layers: mapbox
-    }).setView([40.7518,-73.9819],9);
+    }).setView([40.7518,-73.9819],7);
 	
 	var baseMaps = {
 		"<span style='color: gray'>Mapbox</span>": mapbox,
@@ -94,6 +94,36 @@ function init() {
 	heatmap  = new L.Heatmap().addTo(map);
 	heatmap.setZIndex(4);
 	
+	$('input[type=radio][name=dataset]').click(function() {
+        if (this.value == 'nyc_taxi') {
+			
+			dataset = "taxi";
+			time_from = "2015-01-01 00:00:00";	
+			time_to = "2016-06-30 00:00:00";
+			getTimeseries();
+			map.setView([40.7518,-73.9819],7);
+			getTimeseries();
+
+        }
+        else if (this.value == 'crime') {
+			dataset = "crime";
+			time_from = "2015-01-01 00:00:00";	
+			time_to = "2017-06-30 00:00:00";
+			getTimeseries();
+			map.setView([41.7863,-87.8105],7);
+			
+        }
+		else if (this.value == 'brightkite') {
+			
+			dataset = "brightkite";
+           	time_from = "2008-01-01 00:00:00";	
+			time_to = "2011-01-31 00:00:00";
+			getTimeseries();
+			map.setView([20,0],2);
+			
+
+        }
+    });
 }
 
 function nextColor(){
@@ -141,10 +171,13 @@ function getTimeseries(){
 
 	
 	$.get(url+'/time_series', {
+			
+			dataset:dataset,
 			level : map.getZoom(),
 			bounds: bounds,
 			time_from: time_from,
 			time_to: time_to
+			
 		},  function(data,textStatus){
 			
 			
@@ -153,22 +186,22 @@ function getTimeseries(){
 			time_series = [];
 			for (i in data  ) {
 				d = moment(i).format("YYYY-MM-DD HH:mm:ss");
-				time_series.push([d,data[i]]);
+				if(dataset=="crime"){
+					if(data[i]<2000)
+						time_series.push([d,data[i]]);
+				}else{
+					time_series.push([d,data[i]]);
+				}
 			}
-
+				
 			time_series.sort(function(x, y){
+			   
 			   return d3.ascending(x[0],y[0]);
 			});
 			
-			console.log(time_series);
-			
-			if(time_series.length>1) {
 				
-				
-				
-				d3.select("svg").remove();
-				loadLineChart(time_series,"date");
-			}
+			d3.select("svg").remove();
+			loadLineChart(time_series,"date");
 			
 		},"json");	
 }
