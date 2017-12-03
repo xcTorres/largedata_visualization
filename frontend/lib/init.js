@@ -21,7 +21,7 @@ function init() {
 	
 	/*添加底图*/
 	map =L.map(mapid,{
-		maxZoom: 16,
+		maxZoom: 17,
 		minZoom: 2,
 		maxBounds: [
 			//south west
@@ -100,15 +100,18 @@ function init() {
 			dataset = "taxi";
 			time_from = "2015-01-01 00:00:00";	
 			time_to = "2016-06-30 00:00:00";
+			PLOTTING_TRANSFORM = "density_scaling";
 			getTimeseries();
 			map.setView([40.7518,-73.9819],7);
-			getTimeseries();
+
+			
 
         }
         else if (this.value == 'crime') {
 			dataset = "crime";
 			time_from = "2015-01-01 00:00:00";	
 			time_to = "2017-06-30 00:00:00";
+			PLOTTING_TRANSFORM = "density_scaling";
 			getTimeseries();
 			map.setView([41.7863,-87.8105],7);
 			
@@ -118,6 +121,7 @@ function init() {
 			dataset = "brightkite";
            	time_from = "2008-01-01 00:00:00";	
 			time_to = "2011-01-31 00:00:00";
+			PLOTTING_TRANSFORM = "no_scaling";
 			getTimeseries();
 			map.setView([20,0],2);
 			

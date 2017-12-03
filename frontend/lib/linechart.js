@@ -8,15 +8,14 @@ function loadLineChart(datas, field_Name) {
 	
 	
 	var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
-	//var parseTime2 = d3.timeParse("%Y-%m-%d");
 	
 	
 	var svg = div.append("svg")  
-				 .style("width", 1228)
+				 .style("width", 1500)
 				 .style("height", 200);
 				 
 		margin = {top: 10, right: 20, bottom: 20, left: 60},
-		width = 1228 - margin.left - margin.right,
+		width = 1500 - margin.left - margin.right,
 		height = 200 - margin.top - margin.bottom,
 		g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
@@ -28,23 +27,25 @@ function loadLineChart(datas, field_Name) {
 	var xAxis = d3.axisBottom(x);
 	var yAxis = d3.axisLeft(y);
 	
+	
+	var area = d3.area()
+        .curve(d3.curveLinear)
+        //.interpolate("monotone")
+        .x(function (d) { return x( parseTime(d[0]) ); })
+		.y0(y(0))
+        .y1(function (d) { return y(d[1]); });
+	
 	//定义直线类型
 	var line = d3.line()
 		.curve(d3.curveLinear)
 		.x(function(d) { return x( parseTime(d[0]) ); })
 		.y(function(d) { return y( d[1] ); });
 		
-	var line2 = d3.line()
-		.curve(d3.curveCardinal)
-		.x(function(d) { return x( parseTime2(d[0]) ); })
-		.y(function(d) { return y( d[1] ); });
 
     // Select the svg element, if it exists.
     var svg = div.selectAll('svg').data([datas]);
 
     //Scale宽度所对应的值
-	// x.domain(d3.extent(datas, function(d) { return parseTime(d[0]); }));
-	//x.domain([ parseTime(time_from),parseTime(time_to) ]);
 	x.domain([ parseTime(time_from),parseTime(time_to) ]);
 
 	y.domain([
@@ -53,11 +54,7 @@ function loadLineChart(datas, field_Name) {
 	]);
 
 	
-    g.append("text")
-      .attr("x", width/2 )
-      .attr("y", margin.top)
-      .attr("dy", "1em")
-      .text("Timeline");
+	
 	
 	g.append("g")
 		.attr("class", "axis axis--x")
@@ -75,6 +72,12 @@ function loadLineChart(datas, field_Name) {
 		.attr("fill", "#000");
 	
 	
+	g.append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", width)
+        .attr("height", height);
+	
 	//添加画线的画布
 	g.selectAll("time")
 		.data([datas])
@@ -85,12 +88,45 @@ function loadLineChart(datas, field_Name) {
         .attr("width",width)
         .attr("height", height)
 		.attr("d", line(datas));
+		
+	var gradient = svg.append("defs").append("linearGradient")
+        .attr("id", "gradient")
+        .attr("x2", "0%")
+        .attr("y2", "100%");
+
+    gradient.append("stop")
+        .attr("offset", "70%")
+        .attr("stop-color", "#007399")
+        .attr("stop-opacity", 1);
+
+    gradient.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", "red")
+        .attr("stop-opacity", 1);
+	
+	g.selectAll("time")
+		.data([datas])
+		.enter().append("g")
+		.append("path")
+		.attr("class", "area")
+        .attr("clip-path", "url(#clip)")
+        .style("fill", "url(#gradient)")
+		.attr("width",width)
+        .attr("height", height)
+		.attr("d", area(datas));;
+	
+   g.append("text")
+      .attr("x", width/2 )
+      .attr("y", margin.top)
+      .attr("dy", "1em")
+      .text("Timeline");
 	
 	
 	var zoom = d3.zoom()
-
+		.scaleExtent([1 / 4, 8])
 		.on("zoom", draw)
 		.on("end",update_linechart);
+	
 	g.append("rect")
 		.attr("width", width)
 		.attr("height", height)
@@ -105,6 +141,7 @@ function loadLineChart(datas, field_Name) {
 
 		svg.select("g.axis.axis--x").call(xAxis.scale(xz));
 		svg.select("path.line").attr("d", line.x(function(d) { return xz(parseTime(d[0]))}));
+		svg.select("path.area").attr("d", area.x(function(d) { return xz(parseTime(d[0]))}));
 	}
 	
 	function update_linechart() {

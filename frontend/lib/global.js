@@ -2,9 +2,15 @@
 var map;
 var heatmap = null;
 var url = "http://192.168.0.17:9010";
+
 var time_from = "2015-01-01 00:00:00";	
 var time_to = "2016-06-30 00:00:00";
 var dataset = "taxi";
+var BRIGHTNESS = -13;
+var PLOTTING_MODE = "rect";
+var PLOTTING_COLOR_SCALE = "ryw";
+var PLOTTING_TRANSFORM = "density_scaling";
+
 var time_series = [];
 $.ajaxSetup({
     timeout: 20000 //Time in milliseconds

@@ -110,9 +110,8 @@ L.Heatmap = L.GridLayer.extend({
 
 function color_tile(entry) {
     //entry.context.clearRect(0, 0, 256, 256);
-
+	var area_sum = Object.keys(entry.data).length;
     var fs = pickDrawFuncs();
-	
 	
 	for (i in entry.data  ) {
     //entry.data.forEach(function (d) {
@@ -134,22 +133,18 @@ function color_tile(entry) {
 		
 	  count = entry.data[i];
 	  
-	  //console.log(i);
-	  //console.log(count);
+
 			
 	  var datum = {
 		  
-		  data_zoom:-1,
 		  count: count,
 		  tile_zoom: entry.tile_zoom,
-			// x:offset.x,
-			// y:offset.y,			
-			x:x,
-			y:y
+		  area_sum:area_sum,
+		  x:x,
+		  y:y
 	  };
 		
-	  fs.count_transform(datum);
-	  entry.context.fillStyle = fs.color(count);//
+	  entry.context.fillStyle = fs.color(fs.count_transform(datum)*datum.count);//
 	  
 	  fs.draw(entry.context, datum);
 	}
@@ -160,7 +155,7 @@ function pickDrawFuncs() {
     var colormaps = {
         ryw: function (count) {
 
-				var lc = Math.log(count + 1) / Math.log(50);
+				var lc = Math.log(count + 1) / Math.log(30);
 
 				var r = Math.floor(256 * Math.min(1, lc));
 				var g = Math.floor(256 * Math.min(1, Math.max(0, lc - 1)));
@@ -182,6 +177,7 @@ function pickDrawFuncs() {
     var drawfuncs = {
         circle: function draw_circle(context, datum) {
             var radius = 3.0;
+			
             // var midx = (datum.x0 + datum.x1) / 2;
             // var midy = (datum.y0 + datum.y1) / 2;
             context.beginPath();
@@ -191,7 +187,12 @@ function pickDrawFuncs() {
         rect: function draw_rect(context, datum) {
             // var width = datum.x1 - datum.x0;
             // var height = datum.y1 - datum.y0;
-            context.fillRect(datum.x, datum.y,3,3);
+			var radius = 2.0;
+			
+			if(datum.tile_zoom>=14)
+				radius = 4.0;
+			
+            context.fillRect(datum.x, datum.y,radius,radius);
         }
     };
 
@@ -209,7 +210,10 @@ function pickDrawFuncs() {
              *
              * BRIGHTNESS is linked to the UI control (see bottom of file)
              */
-            return Math.pow(2, datum.data_zoom + datum.tile_zoom + BRIGHTNESS);
+			if(datum.area_sum<=100 && datum.tile_zoom>10)
+				return   Math.pow(2, datum.tile_zoom-10);
+			else
+				return 1;
         },
         no_scaling: function () {
             return 1;
@@ -224,7 +228,4 @@ function pickDrawFuncs() {
 }
 
 /* Controls for color scale */
-var BRIGHTNESS = -7;
-var PLOTTING_MODE = "rect";
-var PLOTTING_COLOR_SCALE = "ryw";
-var PLOTTING_TRANSFORM = "density_scaling";
+
