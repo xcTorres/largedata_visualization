@@ -4,10 +4,10 @@ But because of its characteristic of 'big' ,it is difficult for us to visualize 
 
 So now we have an idea and develope this project,called largedata_visulization.
 
-This project is a complete system wihch include parts of  data preprocesisng,data store,and visualization in fornt end.
+This project is a complete system wihch include parts of  data preprocessing,data store,and visualization in fornt end.
 
 this is New York taxi dataset 
 ![](/img/taxi.gif)
 
 this is brightkite check dataset 
-![](/img/show2.png)
+![](/img/brightkite.gif)
