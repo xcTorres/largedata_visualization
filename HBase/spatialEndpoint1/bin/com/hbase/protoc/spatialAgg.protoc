@@ -1,0 +1,23 @@
+option java_package = "com.hbase.protoc";
+option java_outer_classname = "SpatialAgg";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+option optimize_for = SPEED;
+message SpatialAggRequest {
+  required string startTime = 1;
+  required string endTime = 2;
+  required string rowKey = 3;
+}
+ 
+message SpatialAggResponse {
+  repeated SumMatrix sum = 1;
+}
+
+message SumMatrix{
+  repeated int32 array = 1;
+}
+
+service SpatialAggService {
+  rpc getSpatialAgg(SpatialAggRequest)
+    returns (SpatialAggResponse);
+}
