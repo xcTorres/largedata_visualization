@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.Coprocessor;
 import org.apache.hadoop.hbase.CoprocessorEnvironment;
-import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorException;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorService;
 import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
@@ -21,25 +21,26 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.QualifierFilter;
 import org.apache.hadoop.hbase.protobuf.ResponseConverter;
-import org.apache.hadoop.hbase.regionserver.InternalScanner;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import com.google.protobuf.RpcCallback;
 import com.google.protobuf.RpcController;
 import com.google.protobuf.Service;
+import com.hbase.endpoint.DateCal;
 import com.hbase.protoc.SpatialAgg.SpatialAggRequest;
 import com.hbase.protoc.SpatialAgg.SpatialAggResponse;
 import com.hbase.protoc.SpatialAgg.SpatialAggService;
 import com.hbase.protoc.SpatialAgg.SumMatrix;
+
 /**
- * 
  * @author zhou_20180416
- * @category spatial aggregation coprocessor by Scan function 
+ * @category spatial aggregation coprocessor by Get function 
  * @param rowkey, start_time, end_time
  * @return aggregation result(a list)
  */
-public class SpatialScanEP extends SpatialAggService implements Coprocessor,CoprocessorService{
+public class SpatialGetEP extends SpatialAggService implements Coprocessor,CoprocessorService{
 
+	
 	private RegionCoprocessorEnvironment env;
 	
 	//private BufferedWriter out = null;    
@@ -75,55 +76,63 @@ public class SpatialScanEP extends SpatialAggService implements Coprocessor,Copr
         for (int i = 0;i < 65536; i++){
     		lstData.add(0);
     	}
-		
 		try {
 			/*w = new FileWriter("/tmp/log.txt");
 		    out = new BufferedWriter(w);*/
-			
+			    
 	        //get single rowkey, filter by QualifierFilter
 	        List<String> mapRes = DateCal.Calculate(request.getStartTime(),request.getEndTime());
-	       
-	        Scan scan = new Scan();
-	        //set the filter
+	        	        
 	        List<Filter> filterLst = new ArrayList<Filter>();
 	        Filter qualifierFilter = null;
-	        
 	        for(String str : mapRes){
-	        	scan.addColumn(Bytes.toBytes("heatmap"), Bytes.toBytes(str));  //set the scan column
-	        	qualifierFilter = new QualifierFilter(CompareFilter.CompareOp.EQUAL,new BinaryComparator(Bytes.toBytes(str)));
+	            qualifierFilter = new QualifierFilter(CompareFilter.CompareOp.EQUAL,new BinaryComparator(Bytes.toBytes(str)));
 	            filterLst.add(qualifierFilter);
 	        }
+
 	        FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ONE,filterLst);
-	        scan.setStartRow(Bytes.toBytes(request.getRowKey()));
-			scan.setStopRow(Bytes.toBytes(request.getRowKey()));
-			scan.setFilter(filterList);
+	        Get get = new Get(Bytes.toBytes(request.getRowKey()));
+	        get.setFilter(filterList);
 			
-	        InternalScanner scanner = null;
-        	try {
-        		scanner = env.getRegion().getScanner(scan);
-        		
-        		List<Cell> result = new ArrayList<Cell>();
-				scanner.next(result);
-				for(Cell cell : result) {
-					byte[] v = cell.getValue();
-					if (v != null) {
-						valAggCal(v, lstData);
-					}
+	        Result getResult = env.getRegion().get(get);
+			
+            for (String s : mapRes){
+            		            	
+            	byte[] v = getResult.getValue(Bytes.toBytes("heatmap"), Bytes.toBytes(s));
+                if (v != null) {
+					valAggCal(v, lstData);
 				}
-				result.clear();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}finally {
-				scanner.close();
-			}
-	         
-	        sendResponseBack(lstData, done);
-    
+            }
+            /*out.write("Agg time: "+ (t2 - t1) + "\n");
+            out.write("step2" + "\n");*/
+            
+           /* int count = 0;
+            for(int i : lstData) {
+            	if(i != 0) {
+            		out.write(i + " ");
+            		count++;
+            	}
+            	if (count == 50) {
+					out.write("\n");
+					count = 0;
+				}
+            }*/
+            
+            sendResponseBack(lstData, done);
+	        
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			ResponseConverter.setControllerException(controller,e);
+            sendResponseBack(lstData,done);
 		}finally{
 		
+	        /*try {
+	        	out.close();
+	        	w.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 		}
 	}
 	
@@ -133,6 +142,8 @@ public class SpatialScanEP extends SpatialAggService implements Coprocessor,Copr
         SpatialAggResponse response = SpatialAggResponse.newBuilder().addAllSum(lst).build();
         done.run(response);
 	}
+	
+	
 	
 	private void valAggCal(byte[] val, List<Integer> l){
     	
@@ -178,5 +189,6 @@ public class SpatialScanEP extends SpatialAggService implements Coprocessor,Copr
 
         return n;
     }
+	
 
 }
