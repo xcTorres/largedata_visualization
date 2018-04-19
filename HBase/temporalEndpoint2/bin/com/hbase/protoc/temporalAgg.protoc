@@ -1,0 +1,25 @@
+option java_package = "com.hbase.protoc";
+option java_outer_classname = "TemporalAgg";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+option optimize_for = SPEED;
+message TemporalAggRequest {
+  required string rowkey = 1;
+  required string cateList = 2;
+  required string startTime = 3;
+  required string endTime = 4;
+}
+ 
+message TemporalAggResponse {
+   repeated TimeMap timeMap = 1;
+   
+   message TimeMap{
+      optional string key = 1;
+      optional int64 value = 2; 
+   }
+}
+
+service TemporalAggService {
+  rpc getTemporalAgg(TemporalAggRequest)
+    returns (TemporalAggResponse);
+}
