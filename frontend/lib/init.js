@@ -1,12 +1,5 @@
+
 var colors = colorbrewer.Oranges[9];
-//var url = "http://127.0.0.1:9001/";
-// var url = "./city.json";
-// var map;
-// var heatmapLayer;
-// var bounds = [];
-// var time_from = "2016-01-01";	
-// var time_to = "2016-03-01";
-// var heatmap = null;
 function init() {
 	
 	var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -20,7 +13,7 @@ function init() {
 	
 	
 	/*添加底图*/
-	map =L.map(mapid,{
+	map =L.map("map",{
 		maxZoom: 17,
 		minZoom: 2,
 		maxBounds: [
@@ -31,7 +24,7 @@ function init() {
 			],
 		noWrap: true,
 		layers: mapbox
-    }).setView([40.7518,-73.9819],7);
+    }).setView([40.7518,-73.9819],12);
 	
 	var baseMaps = {
 		"<span style='color: gray'>Mapbox</span>": mapbox,
@@ -84,13 +77,15 @@ function init() {
 	
 	map.on('moveend zoomend', function() {
 		
-		getTimeseries();
+		var sw = map.getBounds().getSouthWest();
+		var ne = map.getBounds().getNorthEast(); 
+		bounds = sw.lng.toFixed(4)+","+ sw.lat.toFixed(4)+","+ne.lng.toFixed(4)+","+ne.lat.toFixed(4);
+		
+		Query();
 	});
-	
-	
-	getTimeseries();
-			
 
+	
+	
 	heatmap  = new L.Heatmap().addTo(map);
 	heatmap.setZIndex(4);
 	
@@ -98,8 +93,8 @@ function init() {
         if (this.value == 'nyc_taxi') {
 			
 			dataset = "taxi";
-			time_from = "2015-01-01 00:00:00";	
-			time_to = "2016-06-30 00:00:00";
+			time_from = "2015-01-01";	
+			time_to = "2016-06-30";
 			PLOTTING_TRANSFORM = "density_scaling";
 			getTimeseries();
 			map.setView([40.7518,-73.9819],7);
@@ -128,6 +123,9 @@ function init() {
 
         }
     });
+	
+	
+	Query();
 }
 
 function nextColor(){
@@ -155,10 +153,10 @@ function drawCreated(e){
 		});
     }
 	
-	var sw = e.layer.getBounds().getSouthWest();
+	/*var sw = e.layer.getBounds().getSouthWest();
 	var ne = e.layer.getBounds().getNorthEast(); 
 	bounds = [sw.lng.toFixed(4),sw.lat.toFixed(4),ne.lng.toFixed(4),ne.lat.toFixed(4)];	
-	console.log(bounds);
+	console.log(bounds);*/
 };
 
 function drawstop(e){	
@@ -167,45 +165,59 @@ function drawstop(e){
 	//getHeatMap(this.bounds,time_from,time_to);
 };
 
-function getTimeseries(){
+
+
+function Query(){
+	
 	
 	var sw = map.getBounds().getSouthWest();
 	var ne = map.getBounds().getNorthEast(); 
-	var bounds = sw.lng.toFixed(4)+","+ sw.lat.toFixed(4)+","+ne.lng.toFixed(4)+","+ne.lat.toFixed(4);
+	bounds = sw.lng.toFixed(4)+","+ sw.lat.toFixed(4)+","+ne.lng.toFixed(4)+","+ne.lat.toFixed(4);
 
-	
 	$.get(url+'/time_series', {
+		
+		dataset:dataset,
+		level : map.getZoom(),
+		bounds: bounds,
+		time_from: time_from,
+		time_to: time_to
+		
+	},  function(data,textStatus){
+		
+		//console.log(data["time_series"]);
+		var time_series = [];
+		for (i in data["time_series"]  ) {
 			
-			dataset:dataset,
-			level : map.getZoom(),
-			bounds: bounds,
-			time_from: time_from,
-			time_to: time_to
 			
-		},  function(data,textStatus){
+			d = moment(i).format("YYYY-MM-DD");
+			time_series.push([d,data["time_series"][i]]);
+		}
 			
+		time_series.sort(function(x, y){
+		   return d3.ascending(x[0],y[0]);
+		});
+		
+		
+		//console.log(data['day_of_week']);
+		d3.select("svg").remove();
+		loadLineChart(time_series,"timeSeries");
+		
+		
+		var categories = [];
+		for (i in data["categories"]  ) {
 			
-			
-			
-			time_series = [];
-			for (i in data  ) {
-				d = moment(i).format("YYYY-MM-DD HH:mm:ss");
-				if(dataset=="crime"){
-					if(data[i]<2000)
-						time_series.push([d,data[i]]);
-				}else{
-					time_series.push([d,data[i]]);
-				}
-			}
-				
-			time_series.sort(function(x, y){
-			   
-			   return d3.ascending(x[0],y[0]);
-			});
-			
-				
-			d3.select("svg").remove();
-			loadLineChart(time_series,"date");
-			
-		},"json");	
+			categories.push(data["categories"][i]);
+		}
+		
+		
+		console.log(categories);
+		setGroupBarchart(categories,"#groupBarchart");
+	},"json");	
+	
 }
+
+
+
+
+
+

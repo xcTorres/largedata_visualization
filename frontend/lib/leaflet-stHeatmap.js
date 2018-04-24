@@ -11,46 +11,14 @@ L.Heatmap = L.GridLayer.extend({
 
         var context = tile.getContext('2d');
 		
-		var tileBounds = this._tileCoordsToBounds(coords);
-			sw = tileBounds.getSouthWest();
-			ne = tileBounds.getNorthEast(); 
-		bounds = [sw.lng.toFixed(4),sw.lat.toFixed(4),ne.lng.toFixed(4),ne.lat.toFixed(4)];	
-		
-		// console.log(time_from);
-		// console.log(time_to);
-		//url = "./"+ coords.x + "_" + coords.y + "_" + coords.z + ".json";
-		
-
-
-		// nw = tileBounds.getNorthWest();
-
-        // context.fillStyle = 'white';
-        // context.fillRect(0, 0, tileSize.x, 50);
-        // context.fillStyle = 'black';
-        // context.fillText('x: ' + coords.x + ', y: ' + coords.y + ', zoom: ' + coords.z, 20, 20);
-        // context.fillText('lat: ' + sw.lat.toFixed(4) + ', lon: ' + sw.lng.toFixed(4), 20, 40);
-        // context.strokeStyle = 'red';
-        // context.beginPath();
-        // context.moveTo(0, 0);
-        // context.lineTo(tileSize.x-1, 0);
-        // context.lineTo(tileSize.x-1, tileSize.y-1);
-        // context.lineTo(0, tileSize.y-1);
-        // context.closePath();
-        // context.stroke();
 		
 		var startDate = moment(time_from).format("MM-DD");
 		var endDate = moment(time_to).format("MM-DD");
-
-		
-		//'/tile'
-		//url = "./20/"+coords.x+"_"+coords.y+".json";
-		//console.log(url);
-		
-		var st_tileId = coords.x + '' + coords.y +  coords.z + startDate +endDate;
-		
-		//console.log(st_tileId);
 		
 		
+		var st_tileId = coords.x + '' + coords.y + ' '+ coords.z + ' ' + startDate + ' ' + endDate;
+		
+	
 		if( heatmapCache(st_tileId) !== undefined) {
 			
 			var data = heatmapCache(st_tileId);
@@ -77,7 +45,6 @@ L.Heatmap = L.GridLayer.extend({
 				},  function(data,textStatus){
 						
 						var count = Object.keys(data).length;
-						//console.log(count);
 						
 						if(count>1000)
 							heatmapCache(st_tileId,data);
@@ -109,17 +76,11 @@ L.Heatmap = L.GridLayer.extend({
 
 
 function color_tile(entry) {
-    //entry.context.clearRect(0, 0, 256, 256);
+
 	var area_sum = Object.keys(entry.data).length;
     var fs = pickDrawFuncs();
 	
 	for (i in entry.data  ) {
-    //entry.data.forEach(function (d) {
-		
-       // var point = map.project( L.latLng(d.y, d.x), entry.tile_zoom).floor();
-       // var coords = point.unscaleBy(entry.tileSize).floor();
-       // var offset = point.subtract(coords.scaleBy(entry.tileSize));
-       // coords.z = entry._tileZoom;
       i = parseInt(i);
 
 		  
@@ -155,7 +116,7 @@ function pickDrawFuncs() {
     var colormaps = {
         ryw: function (count) {
 
-				var lc = Math.log(count + 1) / Math.log(30);
+				var lc = Math.log(count + 1) / Math.log(20);
 
 				var r = Math.floor(256 * Math.min(1, lc));
 				var g = Math.floor(256 * Math.min(1, Math.max(0, lc - 1)));
@@ -187,10 +148,10 @@ function pickDrawFuncs() {
         rect: function draw_rect(context, datum) {
             // var width = datum.x1 - datum.x0;
             // var height = datum.y1 - datum.y0;
-			var radius = 2.0;
+			var radius = 1.0;
 			
-			if(datum.tile_zoom>=14)
-				radius = 4.0;
+			// if(datum.tile_zoom>=14)
+				// radius = 4.0;
 			
             context.fillRect(datum.x, datum.y,radius,radius);
         }
@@ -210,10 +171,10 @@ function pickDrawFuncs() {
              *
              * BRIGHTNESS is linked to the UI control (see bottom of file)
              */
-			if(datum.area_sum<=100 && datum.tile_zoom>10)
-				return   Math.pow(2, datum.tile_zoom-10);
-			else
-				return 1;
+			// if(datum.area_sum<=100 && datum.tile_zoom>10)
+				// return   Math.pow(2, datum.tile_zoom-10);
+			// else
+			return 1;
         },
         no_scaling: function () {
             return 1;
@@ -228,4 +189,32 @@ function pickDrawFuncs() {
 }
 
 /* Controls for color scale */
+
+
+		// var tileBounds = this._tileCoordsToBounds(coords);
+			// sw = tileBounds.getSouthWest();
+			// ne = tileBounds.getNorthEast(); 
+		// bounds = [sw.lng.toFixed(4),sw.lat.toFixed(4),ne.lng.toFixed(4),ne.lat.toFixed(4)];	
+		
+		// console.log(time_from);
+		// console.log(time_to);
+		//url = "./"+ coords.x + "_" + coords.y + "_" + coords.z + ".json";
+		
+
+
+		// nw = tileBounds.getNorthWest();
+
+        // context.fillStyle = 'white';
+        // context.fillRect(0, 0, tileSize.x, 50);
+        // context.fillStyle = 'black';
+        // context.fillText('x: ' + coords.x + ', y: ' + coords.y + ', zoom: ' + coords.z, 20, 20);
+        // context.fillText('lat: ' + sw.lat.toFixed(4) + ', lon: ' + sw.lng.toFixed(4), 20, 40);
+        // context.strokeStyle = 'red';
+        // context.beginPath();
+        // context.moveTo(0, 0);
+        // context.lineTo(tileSize.x-1, 0);
+        // context.lineTo(tileSize.x-1, tileSize.y-1);
+        // context.lineTo(0, tileSize.y-1);
+        // context.closePath();
+        // context.stroke();
 

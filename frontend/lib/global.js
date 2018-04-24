@@ -1,10 +1,20 @@
 
+var callbacks = null;
+
+var bounds = null, where = "";
+var time_from = "2015-01-01" ;
+var time_to = "2015-12-30";
+var curr_region = null, curr_where = null;
+
+var update = false;
+var update_tile = false;
+
+var total_count = 0, curr_count = 0;
+
 var map;
 var heatmap = null;
-var url = "http://192.168.0.17:9010";
 
-var time_from = "2015-01-01 00:00:00";	
-var time_to = "2016-06-30 00:00:00";
+var url = "http://192.168.0.17:10086";
 var dataset = "taxi";
 var BRIGHTNESS = -13;
 var PLOTTING_MODE = "rect";
@@ -15,6 +25,18 @@ var time_series = [];
 $.ajaxSetup({
     timeout: 20000 //Time in milliseconds
 });
+
+
+function removeByValue(arr, val) {
+  for(var i=0; i<arr.length; i++) {
+    if(arr[i] == val) {
+      arr.splice(i, 1);
+      break;
+    }
+  }
+}
+
+
 
 var cacheLength = 300;
 // 缓存热图数据
