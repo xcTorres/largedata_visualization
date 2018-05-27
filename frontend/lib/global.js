@@ -2,8 +2,8 @@
 var callbacks = null;
 
 var bounds = null, where = "";
-var time_from = "2015-01-01" ;
-var time_to = "2015-12-30";
+var time_from = "2014-01-01" ;
+var time_to = "2014-06-30";
 var curr_region = null, curr_where = null;
 
 var update = false;
@@ -25,6 +25,10 @@ var time_series = [];
 $.ajaxSetup({
     timeout: 20000 //Time in milliseconds
 });
+
+
+var responseTime = [];
+var sumResponse = 0;
 
 
 function removeByValue(arr, val) {

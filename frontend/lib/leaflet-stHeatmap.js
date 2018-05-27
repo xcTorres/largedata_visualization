@@ -2,6 +2,9 @@ L.Heatmap = L.GridLayer.extend({
 	
 	
     createTile: function (coords,done) {
+		
+		var start = new Date().getTime();
+		
         var tile = document.createElement('canvas','leaflet-tile','leaflet-zoom-animated ');
 		
 		
@@ -59,9 +62,23 @@ L.Heatmap = L.GridLayer.extend({
 								tile_y: coords.y,
 								tile_zoom: coords.z
 							};
+							var start1 = new Date().getTime();
+							
 							color_tile(entry);	
+							var end2 = new Date().getTime();
+							console.log((end2-start1));
+							
 						}
 						
+						
+						var end1 = new Date().getTime();
+						responseTime.push(end1-start);
+						sumResponse = sumResponse+(end1-start);
+						if(responseTime.length==500){
+							console.log("avgReponseTime:");
+							console.log(sumResponse/500);
+						}
+							
 						
 				},"json");	
 		}

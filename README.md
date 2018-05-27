@@ -3,6 +3,3 @@ In the era of big data, data exploration and visualization are very important. T
 
 this is New York taxi dataset 
 ![](/img/taxi.gif)
-
-this is brightkite check dataset 
-![](/img/brightkite.gif)

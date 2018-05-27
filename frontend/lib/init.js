@@ -199,7 +199,7 @@ function Query(){
 		
 		
 		//console.log(data['day_of_week']);
-		d3.select("svg").remove();
+		d3.selectAll("svg").remove();
 		loadLineChart(time_series,"timeSeries");
 		
 		
@@ -209,8 +209,7 @@ function Query(){
 			categories.push(data["categories"][i]);
 		}
 		
-		
-		console.log(categories);
+		//console.log(categories);
 		setGroupBarchart(categories,"#groupBarchart");
 	},"json");	
 	

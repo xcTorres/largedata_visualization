@@ -1,6 +1,7 @@
 
 function setGroupBarchart(data , field){
 	
+	
 	var margin = {
 	        top : 30,
 	        right : 10,
@@ -42,7 +43,7 @@ function setGroupBarchart(data , field){
 	
 	y.domain([0, d3.max(data, function (d) {
 				return d3.max(week, function(w,i) { return d[i]; });
-			})]);
+			})]).nice();
 			
 	
 	var xAxis = d3.axisLeft(x);
@@ -50,7 +51,7 @@ function setGroupBarchart(data , field){
 
     var gy = svg.append("g")
             .attr("class", "y axis")
-            .call(yAxis);
+            .call(yAxis.ticks(null, "s"));
 			
 			
 	var gx = svg.append("g")
@@ -59,7 +60,7 @@ function setGroupBarchart(data , field){
 	
 	
 	var colors = d3.scaleOrdinal()
-    .range(["#a05d56", "#d0743c", "#ff8c00"]);
+    .range(["#98abc5", "#6b486b", "#ff8c00"]);
 
         //append rects
     var bars = svg.selectAll(".bar")
