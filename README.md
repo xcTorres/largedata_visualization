@@ -2,4 +2,4 @@ In the era of big data, data exploration and visualization are very important. T
 
 
 this is New York taxi dataset 
-![](/img/taxi.gif)
+![](/img/nyc_taxi.gif)
