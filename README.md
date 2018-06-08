@@ -1,10 +1,11 @@
 Objective  As data collection methods mature and diversify, data sources such as personal smart devices, floating car GPS, Internet of Things, and social media are becoming more and more abundant, and the amount of data has been accumulated in an explosive way. Big data has both spatio-temporal information and high-dimensional features. Spatial and temporal features refer to attribute fields with spatial position and time tags. High dimensional features mean that the target data often contains other valuable attributes. Visual analysis is a very important method for big data research, which can quickly and intuitively help researchers analyze and understand intrinsic values. However, because of its massive volume, spatio-temporal correlation and high dimensions, big data visualization poses much challenges to current implementations, including large memory consumption, high rendering delay, and poor visual effects. To address these problems, this paper takes massive spatio-temporal point datasets as an example, designs and implements a highly scalable visual analysis framework with a pre-processing scheme. Method  This paper proposes a multi-dimensional aggregate pyramid model (MAP) based on the well-known 2D tile pyramid model. It can support multi-dimensional aggregation of time, space, and attributes. This paper uses the Spark cluster as parallel preprocessing platform and distributed HBase as final storage to store the generated MAP data. An open-source distributed visualization framework (MAP-Vis) is built the proposed MAP data. Result  The paper takes the New York taxi data for example, and the experiment result shows that it can support interactive visualization under the query of space, time, and other attribute dimensions, it also proves that MAP-Vis has the scalability of pre-processing capability and the storage capacity. Conclusion  With the distributed processing capabilities, it can achieve sub-second query response and achieve good interactive visualization efficiency. Map-Vis is indeed an effective big data interactive visualization method.
 
+The Web interface of Map-Vis
+![](/img/nyc_taxi.gif)
+
+
 Multidimensional Aggregation Pyramid Model
 ![](/img/MAP.png)
 
  The system architecture of Map-Vis
  ![](/img/MAP-Vis.jpg)
-
-The Web interface of Map-Vis
-![](/img/nyc_taxi.gif)
